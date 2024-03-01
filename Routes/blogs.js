@@ -41,23 +41,23 @@ route.post(
     all.push(postBlog);
     let response = await blogModel.updateOne(
       { username: user },
-      {
-        $set: {
-          blogs: all,
-        },
+        {
+          $set: {
+            blogs: all,
+          },
+        }
+      );
+      if (response.acknowledged) {
+        res.send({
+          success: true,
+          message: "Blog uploaded successfully",
+          id: data[0].blogs[data[0].blogs.length - 1]._id,
+        });
+      } else {
+        res.send({ success: false, message: "Uploading failed" });
       }
-    );
-    if (response.acknowledged) {
-      res.send({
-        success: true,
-        message: "Blog uploaded successfully",
-        id: data[0].blogs[data[0].blogs.length - 1]._id,
-      });
-    } else {
-      res.send({ success: false, message: "Uploading failed" });
     }
-  }
-);
+  );
 
 // To delete a blog
 route.delete("/delete/:username/:id", async (req, res) => {
