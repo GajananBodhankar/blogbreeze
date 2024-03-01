@@ -27,10 +27,10 @@ const upload = multer({
 route.post(
   "/:username",
   upload.fields([
-    { name: "image", maxCount: 50 },
-    { name: "title", maxCount: 50 },
-    { name: "content", maxCount: 50 },
-    { name: "related_links", maxCount: 50 },
+    { name: "image", maxCount:100 },
+    { name: "title", maxCount: 100 },
+    { name: "content", maxCount:100 },
+    { name: "related_links", maxCount: 100 },
   ]),
   async (req, res) => {
     let user = req.params.username;
