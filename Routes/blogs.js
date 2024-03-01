@@ -99,22 +99,24 @@ route.get("/item/:username", async (req, res) => {
 // To get all blogs
 route.get("/all", async (req, res) => {
   let data = await blogModel.find().select({ blogs: 1, username: 1 });
-  let temp = [];
-  data.forEach((i) => {
-    i.blogs.forEach((j) => {
-      temp.push({
-        username: i.username,
-        title: j.title,
-        id: j._id,
-        image: j.image,
-        content: j.content,
-        related_links: j.related_links,
-        likes: j.likes,
-        likedUsers: j.likedUsers,
-      });
-    });
-  });
-  res.send(temp);
+  res.send(
+    data
+      .map((i) =>
+        i.blogs
+          .map((j) => ({
+            username: i.username,
+            title: j.title,
+            id: j._id,
+            image: j.image,
+            content: j.content,
+            related_links: j.related_links,
+            likes: j.likes,
+            likedUsers: j.likedUsers,
+          }))
+          .flat()
+      )
+      .flat()
+  );
 });
 
 route.put("/likes/:username/:blogId", async (req, res) => {
