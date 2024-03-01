@@ -38,6 +38,7 @@ route.post("/:username", async (req, res) => {
     ...req.body,
     related_links: JSON.parse(req.body.related_links),
     image: req.body.image,
+    likes: 0,
   };
 
   let all = data[0].blogs;
@@ -66,7 +67,6 @@ route.delete("/delete/:username/:id", async (req, res) => {
   let user = req.params.username;
   let id = req.params.id;
   let data = await blogModel.find({ username: user });
-  console.log(data);
   let updateData = data[0].blogs.filter((i) => i._id != id);
   let response = await blogModel.updateOne(
     { username: user },
@@ -109,10 +109,34 @@ route.get("/all", async (req, res) => {
         image: j.image,
         content: j.content,
         related_links: j.related_links,
+        likes: j.likes,
+        likedUsers: j.likedUsers,
       });
     });
   });
   res.send(temp);
+});
+
+route.put("/likes/:username/:blogId", async (req, res) => {
+  let data = req.body;
+  let id = req.params.blogId;
+  let user = req.params.username;
+  let response = await blogModel.find({ username: data.username });
+  let result = response[0].blogs.find((i) => i._id == id);
+  if (result.likedUsers.includes(user)) {
+    result.likes = +result.likes - 1;
+    result.likedUsers.splice(result.likedUsers.indexOf(user), 1);
+  } else {
+    result.likes = +result.likes + 1;
+    result.likedUsers.push(user);
+  }
+  let update = await blogModel.findOneAndUpdate(
+    { username: data.username },
+    {
+      $set: { ...response[0] },
+    }
+  );
+  if (update) res.send(response[0].blogs.find((i) => i._id == id));
 });
 
 export default route;
