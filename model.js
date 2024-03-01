@@ -1,3 +1,4 @@
+import { File } from "buffer";
 import mongoose from "mongoose";
 
 let blogSchema = new mongoose.Schema({

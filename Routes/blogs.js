@@ -1,12 +1,19 @@
 import express from "express";
 import blogModel from "../model.js";
-import multer from "multer";
-import path from "path";
-import { fileURLToPath } from "url";
+
+import bodyParser from "body-parser";
 // let __filename = fileURLToPath(import.meta.url);
 // let __dirname = path.dirname(__filename);
 let route = express.Router();
-
+route.use(
+  express.urlencoded({
+    parameterLimit: 1000000,
+    limit: "500mb",
+    extended: true,
+  })
+);
+route.use(bodyParser.json({ limit: "50mb" }));
+route.use(express.json({ limit: "50mb" }));
 // const storage = multer.diskStorage({
 //   destination: (req, file, cb) => {
 //     cb(null, path.join(__dirname, 'public/images'));
@@ -32,6 +39,7 @@ route.post("/:username", async (req, res) => {
     related_links: JSON.parse(req.body.related_links),
     image: req.body.image,
   };
+
   let all = data[0].blogs;
   all.push(postBlog);
   let response = await blogModel.updateOne(
@@ -90,9 +98,21 @@ route.get("/item/:username", async (req, res) => {
 
 // To get all blogs
 route.get("/all", async (req, res) => {
-  let data = await blogModel.find().select({ blogs: 1 });
-  let response = data.map((i) => i.blogs);
-  res.status(200).send(response.flat());
+  let data = await blogModel.find().select({ blogs: 1, username: 1 });
+  let temp = [];
+  data.forEach((i) => {
+    i.blogs.forEach((j) => {
+      temp.push({
+        username: i.username,
+        title: j.title,
+        id: j._id,
+        image: j.image,
+        content: j.content,
+        related_links: j.related_links,
+      });
+    });
+  });
+  res.send(temp);
 });
 
 export default route;
