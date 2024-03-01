@@ -130,13 +130,15 @@ route.put("/likes/:username/:blogId", async (req, res) => {
     result.likes = +result.likes + 1;
     result.likedUsers.push(user);
   }
-  let update = await blogModel.findOneAndUpdate(
-    { username: data.username },
+  let update = await blogModel.findByIdAndUpdate(
+    response[0]._id,
     {
-      $set: { ...response[0] },
-    }
+      $set: response[0],
+    },
+    { new: true }
   );
-  if (update) res.send(response[0].blogs.find((i) => i._id == id));
+  res.send({ id: response[0]._id, data: update });
+  // if (update) res.send(response[0].blogs.find((i) => i._id == id));
 });
 
 export default route;
