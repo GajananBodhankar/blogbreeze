@@ -2,6 +2,9 @@ import express from "express";
 import blogModel from "../model.js";
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
+let __filename = fileURLToPath(import.meta.url);
+let __dirname = path.dirname(__filename);
 let route = express.Router();
 
 const storage = multer.diskStorage({
