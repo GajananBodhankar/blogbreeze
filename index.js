@@ -9,8 +9,8 @@ let __filename = fileURLToPath(import.meta.url);
 let __dirname = path.dirname(__filename);
 let PORT = process.env.PORT || 3000;
 let app = express();
-// app.use(express.static("public"));
-app.use("/public", express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
+// app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.use(
   cors({
