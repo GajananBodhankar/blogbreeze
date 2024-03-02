@@ -124,7 +124,9 @@ route.put("/likes/:username/:blogId", async (req, res) => {
   let id = req.params.blogId;
   let user = req.params.username;
   let response = await blogModel.find({ username: data.username });
-  if (response.length == 0 || !user) {
+
+  let allDataFromDB = await blogModel.find();
+  if (response.length == 0 || !allDataFromDB.find((i) => i.username == user)) {
     res.send({ message: "User not found" });
     return;
   }
