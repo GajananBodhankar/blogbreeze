@@ -124,6 +124,10 @@ route.put("/likes/:username/:blogId", async (req, res) => {
   let id = req.params.blogId;
   let user = req.params.username;
   let response = await blogModel.find({ username: data.username });
+  if (response.length == 0) {
+    res.send({ message: "User not found" });
+    return;
+  }
   let result = response[0].blogs.find((i) => i._id == id);
   if (result.likedUsers.includes(user)) {
     result.likes = +result.likes - 1;
@@ -139,8 +143,7 @@ route.put("/likes/:username/:blogId", async (req, res) => {
     },
     { new: true }
   );
-  res.send({ id: response[0]._id, data: update });
-  // if (update) res.send(response[0].blogs.find((i) => i._id == id));
+  res.send({ success: true, id: response[0]._id, data: update });
 });
 
 export default route;
