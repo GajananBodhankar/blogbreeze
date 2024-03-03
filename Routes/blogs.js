@@ -165,6 +165,16 @@ route.get("/favorite/:username", async (req, res) => {
   }
 });
 
+route.get("/user/:username", async (req, res) => {
+  let user = req.params.username;
+  let data = await blogModel.find({ username: user });
+  if (data.length > 0) {
+    res.status(200).send(data);
+  } else {
+    res.status(400).send({ success: false, message: "User not found" });
+  }
+});
+
 route.put("/favorite/:username", async (req, res) => {
   let reqBody = req.body;
   let user = await blogModel.find({ username: req.params.username });
