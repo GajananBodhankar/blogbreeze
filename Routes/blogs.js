@@ -99,24 +99,33 @@ route.get("/item/:username", async (req, res) => {
 // To get all blogs
 route.get("/all", async (req, res) => {
   let data = await blogModel.find().select({ blogs: 1, username: 1 });
-  res.send(
-    data
-      .map((i) =>
-        i.blogs
-          .map((j) => ({
-            username: i.username,
-            title: j.title,
-            id: j._id,
-            image: j.image,
-            content: j.content,
-            related_links: j.related_links,
-            likes: j.likes,
-            likedUsers: j.likedUsers,
-          }))
-          .flat()
-      )
-      .flat()
+  let page = req.query.page;
+  // res.send({ success: true, page: req.query.page });
+  let result = data
+    .map((i) =>
+      i.blogs
+        .map((j) => ({
+          username: i.username,
+          title: j.title,
+          id: j._id,
+          image: j.image,
+          content: j.content,
+          related_links: j.related_links,
+          likes: j.likes,
+          likedUsers: j.likedUsers,
+        }))
+        .flat()
+    )
+    .flat();
+  let sentData = result.filter(
+    (i, j) => j >= (page - 1) * 9 && j < page * 9
   );
+
+  if (result.filter((i, j) => j >= page * 9).length > 0) {
+    res.send({ data: sentData, hasNext: true });
+  } else {
+    res.send({ data: sentData, hasNext: false });
+  }
 });
 
 route.put("/likes/:username/:blogId", async (req, res) => {
