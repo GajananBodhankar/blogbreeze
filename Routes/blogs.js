@@ -169,7 +169,7 @@ route.get("/user/:username", async (req, res) => {
   let user = req.params.username;
   let data = await blogModel.find({ username: user });
   if (data.length > 0) {
-    res.status(200).send(data);
+    res.status(200).send(data[0].favorites);
   } else {
     res.status(400).send({ success: false, message: "User not found" });
   }
