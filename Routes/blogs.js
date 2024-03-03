@@ -155,31 +155,46 @@ route.put("/likes/:username/:blogId", async (req, res) => {
   res.send({ success: true, id: response[0]._id, data: update });
 });
 
+route.get("/favorite/:username", async (req, res) => {
+  let username = req.params.username;
+  let data = await blogModel.find({ username: username });
+  if (data.length > 0) {
+    res.status(200).send(data);
+  } else {
+    res.send({ success: false, message: "No blogs added to favorite" });
+  }
+});
+
 route.put("/favorite/:username", async (req, res) => {
   let reqBody = req.body;
   let user = await blogModel.find({ username: req.params.username });
-  // if (user[0].favorites.find((i) => i.id == reqBody.id)) {
-  //   console.log(true);
-  // } else {
-  //   console.log(false);
-  // }
-  console.log(
-    user[0].favorites.map((i) => i.id),
-    reqBody.id
-  );
-  user[0].favorites.push(reqBody);
-  console.log(user[0].favorites, req.params.username);
-  // let result = await blogModel.updateOne(
-  //   { username: req.params.username },
-  //   {
-  //     $push: {
-  //       "blogs.0.favorites": [reqBody],
-  //     },
-  //   }
+  if (user[0].favorites.find((i) => i._id == reqBody._id)) {
+    let ind = user[0].favorites.findIndex((i) => i._id == reqBody._id);
+    user[0].favorites.splice(ind, 1);
+    let result = await blogModel.findByIdAndUpdate(user[0]._id, user[0]);
+    if (result) {
+      res.send({
+        success: true,
+        username: req.params.username,
+        id: user[0]._id,
+      });
+    }
+  } else {
+    user[0].favorites.push(reqBody);
+    let result = await blogModel.findByIdAndUpdate(user[0]._id, user[0]);
+    if (result) {
+      res.send({
+        success: true,
+        username: req.params.username,
+        id: user[0]._id,
+      });
+    }
+  }
+  // console.log(
+  //   user[0].favorites.map((i) => i._id),
+  //   reqBody.id
   // );
-  // if (result) {
-  //   res.send({ success: true, username: req.params.username, id: user[0]._id });
-  // }
+
   // console.log(reqBody);
   // res.send(reqBody);
   // let data = await blogModel.findByIdAndUpdate()
