@@ -107,7 +107,7 @@ route.get("/all", async (req, res) => {
         .map((j) => ({
           username: i.username,
           title: j.title,
-          id: j._id,
+          _id: j._id,
           image: j.image,
           content: j.content,
           related_links: j.related_links,
@@ -117,9 +117,7 @@ route.get("/all", async (req, res) => {
         .flat()
     )
     .flat();
-  let sentData = result.filter(
-    (i, j) => j >= (page - 1) * 9 && j < page * 9
-  );
+  let sentData = result.filter((i, j) => j >= (page - 1) * 9 && j < page * 9);
 
   if (result.filter((i, j) => j >= page * 9).length > 0) {
     res.send({ data: sentData, hasNext: true });
@@ -155,6 +153,37 @@ route.put("/likes/:username/:blogId", async (req, res) => {
     { new: true }
   );
   res.send({ success: true, id: response[0]._id, data: update });
+});
+
+route.put("/favorite/:username", async (req, res) => {
+  let reqBody = req.body;
+  let user = await blogModel.find({ username: req.params.username });
+  // if (user[0].favorites.find((i) => i.id == reqBody.id)) {
+  //   console.log(true);
+  // } else {
+  //   console.log(false);
+  // }
+  console.log(
+    user[0].favorites.map((i) => i.id),
+    reqBody.id
+  );
+  user[0].favorites.push(reqBody);
+  console.log(user[0].favorites, req.params.username);
+  // let result = await blogModel.updateOne(
+  //   { username: req.params.username },
+  //   {
+  //     $push: {
+  //       "blogs.0.favorites": [reqBody],
+  //     },
+  //   }
+  // );
+  // if (result) {
+  //   res.send({ success: true, username: req.params.username, id: user[0]._id });
+  // }
+  // console.log(reqBody);
+  // res.send(reqBody);
+  // let data = await blogModel.findByIdAndUpdate()
+  // console.log(data[0].favorites);
 });
 
 export default route;
