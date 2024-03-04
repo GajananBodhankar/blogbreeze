@@ -100,7 +100,6 @@ route.get("/item/:username", async (req, res) => {
 route.get("/all", async (req, res) => {
   let data = await blogModel.find().select({ blogs: 1, username: 1 });
   let page = req.query.page;
-  // res.send({ success: true, page: req.query.page });
   let result = data
     .map((i) =>
       i.blogs
@@ -161,11 +160,10 @@ route.get("/favorites/:username", async (req, res) => {
 
   if (data.length > 0) {
     res.status(200).send(
-      data.map((i) => ({
-        _id: i._id,
-        username: i.username,
-        favorites: i.favorites,
-      }))[0]
+      data[0].favorites.map((i) => ({
+        username: user,
+        favorites: i,
+      }))
     );
   } else {
     res.status(400).send({ success: false, message: "User not found" });
