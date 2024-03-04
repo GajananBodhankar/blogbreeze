@@ -159,12 +159,20 @@ route.get("/favorites/:username", async (req, res) => {
   let data = await blogModel.find({ username: user });
 
   if (data.length > 0) {
-    res.status(200).send(
-      data[0].favorites.map((i) => ({
+    let temp = [];
+    data[0].favorites.forEach((i) =>
+      temp.push({
         username: user,
-        favorites: i,
-      }))
+        title: i.title,
+        _id: i._id,
+        image: i.image,
+        related_links: i.related_links,
+        likes: i.likes,
+        content: i.content,
+        likedUsers: i.likedUsers,
+      })
     );
+    res.status(200).send(temp);
   } else {
     res.status(400).send({ success: false, message: "User not found" });
   }
