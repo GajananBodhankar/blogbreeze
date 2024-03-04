@@ -137,6 +137,15 @@ route.put("/likes/:username/:blogId", async (req, res) => {
     return;
   }
   let result = response[0].blogs.find((i) => i._id == id);
+  console.log(
+    response[0].blogs.map((i) => ({
+      _id: i._id,
+      title: i.title,
+      likedUsers: i.likedUsers,
+      likes: i.likes,
+    }))
+  );
+
   if (result.likedUsers.includes(user)) {
     result.likes = +result.likes - 1;
     result.likedUsers.splice(result.likedUsers.indexOf(user), 1);
@@ -158,11 +167,24 @@ route.get("/favorites/:username", async (req, res) => {
   let user = req.params.username;
   let data = await blogModel.find({ username: user });
 
+  let allBlogData = await blogModel.find();
+  function returnUsername(id) {
+    let str = "";
+    allBlogData.forEach((i) =>
+      i.blogs.forEach((j) => {
+        if (j._id.equals(id)) {
+          str = i.username;
+        }
+      })
+    );
+    return str;
+  }
+
   if (data.length > 0) {
     let temp = [];
     data[0].favorites.forEach((i) =>
       temp.push({
-        username: user,
+        username: returnUsername(i._id),
         title: i.title,
         _id: i._id,
         image: i.image,
@@ -203,15 +225,6 @@ route.put("/favorite/:username", async (req, res) => {
       });
     }
   }
-  // console.log(
-  //   user[0].favorites.map((i) => i._id),
-  //   reqBody.id
-  // );
-
-  // console.log(reqBody);
-  // res.send(reqBody);
-  // let data = await blogModel.findByIdAndUpdate()
-  // console.log(data[0].favorites);
 });
 
 export default route;
