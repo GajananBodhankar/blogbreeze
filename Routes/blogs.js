@@ -158,8 +158,9 @@ route.put("/likes/:username/:blogId", async (req, res) => {
 route.get("/favorite/:username", async (req, res) => {
   let username = req.params.username;
   let data = await blogModel.find({ username: username });
+  let response = data[0].favorites;
   if (data.length > 0) {
-    res.status(200).send(data);
+    res.status(200).send(response);
   } else {
     res.send({ success: false, message: "No blogs added to favorite" });
   }
