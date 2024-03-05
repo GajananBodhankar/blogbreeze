@@ -89,9 +89,18 @@ route.get("/item/:username", async (req, res) => {
   console.log("username", user);
   let response = await blogModel.find({ username: user }).select({ blogs: 1 });
   if (response.length > 0) {
-    let result = response.map((i) => i.blogs);
-    res.status(200).send(...result);
-  } else {
+    let result = response[0].blogs.map((i) => ({
+      username: user,
+      title: i.title,
+      _id: i._id,
+      image: i.image,
+      content: i.content,
+      related_links: i.related_links,
+      likes: i.likes,
+      likedUsers: i.likedUsers,
+    }));
+    res.status(200).send(result);
+    } else {
     res.status(400).send({ data: "", message: "Blogs not found" });
   }
 });
@@ -139,9 +148,7 @@ route.put("/likes/:username/:blogId", async (req, res) => {
   }
   let result = response[0].blogs.find((i) => i._id.equals(id));
 
-  let findItem = favoriteResponse[0].favorites.find((i) =>
-    i._id.equals(id)
-  );
+  let findItem = favoriteResponse[0].favorites.find((i) => i._id.equals(id));
   let findIndex = favoriteResponse[0].favorites.findIndex((i) =>
     i._id.equals(id)
   );
@@ -175,8 +182,6 @@ route.put("/likes/:username/:blogId", async (req, res) => {
   );
   res.send({ success: true, id: response[0]._id, data: update });
 });
-
-
 
 route.get("/favorites/:username", async (req, res) => {
   let user = req.params.username;
