@@ -86,7 +86,6 @@ route.delete("/delete/:username/:id", async (req, res) => {
 // To get blogs specific to user
 route.get("/item/:username", async (req, res) => {
   let user = req.params.username;
-  console.log("username", user);
   let response = await blogModel.find({ username: user }).select({ blogs: 1 });
   if (response.length > 0) {
     let result = response[0].blogs.map((i) => ({
@@ -100,7 +99,7 @@ route.get("/item/:username", async (req, res) => {
       likedUsers: i.likedUsers,
     }));
     res.status(200).send(result);
-    } else {
+  } else {
     res.status(400).send({ data: "", message: "Blogs not found" });
   }
 });
@@ -142,7 +141,7 @@ route.put("/likes/:username/:blogId", async (req, res) => {
   let favoriteResponse = await blogModel.find({ username: user });
 
   let allDataFromDB = await blogModel.find();
-  if (response.length == 0 || !allDataFromDB.find((i) => i.username == user)) {
+  if (response.length == 0 || !allDataFromDB.find((i) => i.username === user)) {
     res.send({ message: "User not found" });
     return;
   }
