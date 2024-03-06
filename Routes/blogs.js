@@ -143,6 +143,26 @@ route.put("/likes/:username/:blogId", async (req, res) => {
     res.send({ message: "User not found" });
     return;
   }
+  let favoriteResponse = await blogModel.find({ username: user });
+
+  let findItem = favoriteResponse[0].favorites.find((i) => i._id.equals(id));
+
+  if (findItem) {
+    if (findItem.likedUsers.includes(user)) {
+      findItem.likes = +findItem.likes - 1;
+      findItem.likedUsers.splice(findItem.likedUsers.indexOf(user), 1);
+    } else {
+      findItem.likes = +findItem.likes + 1;
+      findItem.likedUsers.push(user);
+    }
+    response[0].favorites = favoriteResponse[0].favorites;
+    let update = await blogModel.findByIdAndUpdate(
+      favoriteResponse[0]._id,
+      { $set: favoriteResponse[0] },
+      { new: true }
+    );
+  }
+
   let result = response[0].blogs.find((i) => i._id.equals(id));
   if (result.likedUsers.includes(user)) {
     result.likes = +result.likes - 1;
@@ -151,6 +171,7 @@ route.put("/likes/:username/:blogId", async (req, res) => {
     result.likes = +result.likes + 1;
     result.likedUsers.push(user);
   }
+
   let update = await blogModel.findByIdAndUpdate(
     response[0]._id,
     {
@@ -161,33 +182,33 @@ route.put("/likes/:username/:blogId", async (req, res) => {
   res.send({ success: true, id: response[0]._id, data: update });
 });
 
-route.put("/likes/favorite/:username/:blogId", async (req, res) => {
-  let id = req.params.blogId;
-  let user = req.params.username;
-  let favoriteResponse = await blogModel.find({ username: user });
+// route.put("/likes/favorite/:username/:blogId", async (req, res) => {
+//   let id = req.params.blogId;
+//   let user = req.params.username;
+//   let favoriteResponse = await blogModel.find({ username: user });
 
-  let findItem = favoriteResponse[0].favorites.find((i) => i._id.equals(id));
-  let findIndex = favoriteResponse[0].favorites.findIndex((i) =>
-    i._id.equals(id)
-  );
-  if (findItem) {
-    if (findItem.likedUsers.includes(user)) {
-      findItem.likes = +findItem.likes - 1;
-      findItem.likedUsers.splice(findIndex, 1);
-    } else {
-      findItem.likes = +findItem.likes + 1;
-      findItem.likedUsers.push(user);
-    }
+//   let findItem = favoriteResponse[0].favorites.find((i) => i._id.equals(id));
+//   let findIndex = favoriteResponse[0].favorites.findIndex((i) =>
+//     i._id.equals(id)
+//   );
+//   if (findItem) {
+//     if (findItem.likedUsers.includes(user)) {
+//       findItem.likes = +findItem.likes - 1;
+//       findItem.likedUsers.splice(findIndex, 1);
+//     } else {
+//       findItem.likes = +findItem.likes + 1;
+//       findItem.likedUsers.push(user);
+//     }
 
-    let update = await blogModel.findByIdAndUpdate(
-      favoriteResponse[0]._id,
-      { $set: favoriteResponse[0] },
-      { new: true }
-    );
-    res.send({ success: true, id: favoriteResponse[0]._id, data: update });
-  }
-  res.send({ message: "Item not in favorites" });
-});
+//     let update = await blogModel.findByIdAndUpdate(
+//       favoriteResponse[0]._id,
+//       { $set: favoriteResponse[0] },
+//       { new: true }
+//     );
+//     res.send({ success: true, id: favoriteResponse[0]._id, data: update });
+//   }
+//   res.send({ message: "Item not in favorites" });
+// });
 
 route.get("/favorites/:username", async (req, res) => {
   let user = req.params.username;
