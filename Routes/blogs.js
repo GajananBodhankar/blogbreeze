@@ -2,8 +2,6 @@ import express from "express";
 import blogModel from "../model.js";
 
 import bodyParser from "body-parser";
-// let __filename = fileURLToPath(import.meta.url);
-// let __dirname = path.dirname(__filename);
 let route = express.Router();
 route.use(
   express.urlencoded({
@@ -14,21 +12,6 @@ route.use(
 );
 route.use(bodyParser.json({ limit: "50mb" }));
 route.use(express.json({ limit: "50mb" }));
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, path.join(__dirname, 'public/images'));
-//   },
-//   filename: (req, file, cb) => {
-//     cb(
-//       null,
-//       file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-//     );
-//   },
-// });
-
-// const upload = multer({
-//   storage: storage,
-// });
 
 // To upload a blog
 route.post("/:username", async (req, res) => {
@@ -181,34 +164,6 @@ route.put("/likes/:username/:blogId", async (req, res) => {
   );
   res.send({ success: true, id: response[0]._id, data: update });
 });
-
-// route.put("/likes/favorite/:username/:blogId", async (req, res) => {
-//   let id = req.params.blogId;
-//   let user = req.params.username;
-//   let favoriteResponse = await blogModel.find({ username: user });
-
-//   let findItem = favoriteResponse[0].favorites.find((i) => i._id.equals(id));
-//   let findIndex = favoriteResponse[0].favorites.findIndex((i) =>
-//     i._id.equals(id)
-//   );
-//   if (findItem) {
-//     if (findItem.likedUsers.includes(user)) {
-//       findItem.likes = +findItem.likes - 1;
-//       findItem.likedUsers.splice(findIndex, 1);
-//     } else {
-//       findItem.likes = +findItem.likes + 1;
-//       findItem.likedUsers.push(user);
-//     }
-
-//     let update = await blogModel.findByIdAndUpdate(
-//       favoriteResponse[0]._id,
-//       { $set: favoriteResponse[0] },
-//       { new: true }
-//     );
-//     res.send({ success: true, id: favoriteResponse[0]._id, data: update });
-//   }
-//   res.send({ message: "Item not in favorites" });
-// });
 
 route.get("/favorites/:username", async (req, res) => {
   let user = req.params.username;
