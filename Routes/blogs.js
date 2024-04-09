@@ -71,15 +71,19 @@ route.delete("/delete/:username/:id", async (req, res) => {
 route.put("/edit/:username/:id", async (req, res) => {
   let username = req.params.username,
     blogId = req.params.id;
-  let updatedData = req.body.state;
-  console.log(updatedData, blogId);
+  let updatedData = req.body.data;
   let user = await blogModel.find({ username: username });
   let changeIndex = user[0].blogs.findIndex((i) => i._id == blogId);
   let data = user[0].blogs;
+  let favoriteIndex = user[0].favorites.findIndex((i) => i._id == blogId);
+  let updateFavorite = user[0].favorites;
+  if (favoriteIndex >= 0) {
+    updateFavorite.splice(favoriteIndex, 1, updatedData);
+  }
   data.splice(changeIndex, 1, updatedData);
   let update = await blogModel.updateOne(
     { username: username },
-    { $set: { blogs: data } }
+    { $set: { blogs: data, favorites: updateFavorite } }
   );
   if (update) {
     res.send({ success: true, message: "Updated successfully" });
