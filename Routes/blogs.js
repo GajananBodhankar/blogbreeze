@@ -51,6 +51,18 @@ route.delete("/delete/:username/:id", async (req, res) => {
   let id = req.params.id;
   let data = await blogModel.find({ username: user });
   let updateData = data[0].blogs.filter((i) => i._id != id);
+  let favoriteUpdate = await blogModel.find();
+  favoriteUpdate.forEach(async (i) => {
+    let index = i.favorites.findIndex((ele) => ele._id == id);
+    let x = i.favorites;
+    if (index >= 0) {
+      x.splice(index, 1);
+      let update = await blogModel.findByIdAndUpdate(i._id, {
+        ...i,
+        favorites: x,
+      });
+    }
+  });
   let response = await blogModel.updateOne(
     { username: user },
     {
