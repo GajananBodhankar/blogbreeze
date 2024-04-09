@@ -81,10 +81,23 @@ route.put("/edit/:username/:id", async (req, res) => {
     updateFavorite.splice(favoriteIndex, 1, updatedData);
   }
   data.splice(changeIndex, 1, updatedData);
-  let update = await blogModel.updateOne(
-    { username: username },
-    { $set: { blogs: data, favorites: updateFavorite } }
-  );
+  let allData = await blogModel.find();
+  allData.forEach(async (i) => {
+    let allIndex = i.favorites.findIndex((j) => j._id == blogId);
+    if (allIndex >= 0 && i.username != username) {
+      let x = i.favorites;
+      x.splice(allIndex, 1, updatedData);
+      let update = await blogModel.findByIdAndUpdate(i._id, {
+        ...i,
+        favorites: x,
+      });
+    }
+  });
+  let update = await blogModel.findByIdAndUpdate(user[0]._id, {
+    ...user[0],
+    blogs: data,
+    favorites: updateFavorite,
+  });
   if (update) {
     res.send({ success: true, message: "Updated successfully" });
   } else {
@@ -197,22 +210,23 @@ route.get("/favorites/:username", async (req, res) => {
 
   let allBlogData = await blogModel.find();
   function returnUsername(id) {
-    let str = "";
+    let str = [];
     allBlogData.forEach((i) =>
       i.blogs.forEach((j) => {
         if (j._id.equals(id)) {
-          str = i.username;
+          str.push(i);
         }
       })
     );
-    return str;
+    console.log(str);
+    return str[0];
   }
 
   if (data.length > 0) {
     let temp = [];
     data[0].favorites.forEach((i) =>
       temp.push({
-        username: returnUsername(i._id),
+        username: returnUsername(i._id).username,
         title: i.title,
         _id: i._id,
         image: i.image,
