@@ -71,9 +71,21 @@ route.delete("/delete/:username/:id", async (req, res) => {
 route.put("/edit/:username/:id", async (req, res) => {
   let username = req.params.username,
     blogId = req.params.id;
+  let updatedData = req.body.state;
+  console.log(updatedData, blogId);
   let user = await blogModel.find({ username: username });
-  console.log(user);
-  res.send({ data: user });
+  let changeIndex = user[0].blogs.findIndex((i) => i._id == blogId);
+  let data = user[0].blogs;
+  data.splice(changeIndex, 1, updatedData);
+  let update = await blogModel.updateOne(
+    { username: username },
+    { $set: { blogs: data } }
+  );
+  if (update) {
+    res.send({ success: true, message: "Updated successfully" });
+  } else {
+    res.send({ success: false, message: "Error in updation" });
+  }
 });
 
 // To get blogs specific to user
