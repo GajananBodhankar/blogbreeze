@@ -66,6 +66,16 @@ route.delete("/delete/:username/:id", async (req, res) => {
   }
 });
 
+// To edit a blog
+
+route.put("/edit/:username/:id", async (req, res) => {
+  let username = req.params.username,
+    blogId = req.params.id;
+  let user = await blogModel.find({ username: username });
+  console.log(user);
+  res.send({ data: user });
+});
+
 // To get blogs specific to user
 route.get("/item/:username", async (req, res) => {
   let user = req.params.username;
