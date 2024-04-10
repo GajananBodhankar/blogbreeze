@@ -90,9 +90,17 @@ route.put("/edit/:username/:id", async (req, res) => {
   let favoriteIndex = user[0].favorites.findIndex((i) => i._id == blogId);
   let updateFavorite = user[0].favorites;
   if (favoriteIndex >= 0) {
-    updateFavorite.splice(favoriteIndex, 1, updatedData);
+    updateFavorite.splice(favoriteIndex, 1, {
+      ...updatedData,
+      likedUsers: updateFavorite[favoriteIndex].likedUsers,
+      likes: updateFavorite[favoriteIndex].likes,
+    });
   }
-  data.splice(changeIndex, 1, updatedData);
+  data.splice(changeIndex, 1, {
+    ...updatedData,
+    likedUsers: data[changeIndex].likedUsers,
+    likes: data[changeIndex].likes,
+  });
   let allData = await blogModel.find();
   allData.forEach(async (i) => {
     let allIndex = i.favorites.findIndex((j) => j._id == blogId);
@@ -230,7 +238,6 @@ route.get("/favorites/:username", async (req, res) => {
         }
       })
     );
-    console.log(str);
     return str[0];
   }
 
